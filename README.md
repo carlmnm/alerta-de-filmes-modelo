@@ -4,7 +4,7 @@ Avisa por e-mail quando um filme da sua lista **já caiu do caminhão**.
 
 Você cadastra os filmes que está esperando como **Issues** deste repositório. De tempos em tempos, o GitHub Actions consulta o AIOStreams (o mesmo addon que o Nuvio usa) e, quando o filme tem streams bons suficientes, manda um e-mail, comenta na Issue e a fecha.
 
-Recomendo que use um email novo só para disparar os emails de alerta.
+Recomendo que use um email novo só para disparar os emails de alerta e que use NOME DO FILME + ANO na issue.
 
 Clique em "Use this tamplate" e aproveite!
 
