@@ -150,9 +150,9 @@ Os e-mails do GitHub sobre comentários e fechamento das Issues são notificaç�
 
 ---
 
-## Opcional: criar Issue por e-mail
+## Criar Issue por e-mail
 
-Dá para o script ler a caixa de entrada do Gmail (IMAP) e transformar e-mails em Issues: o **assunto** vira o título. Só valem e-mails de remetentes listados em `EMAIL_TO`, e os avisos do próprio script (assunto começando com "Ahoy") são ignorados. O e-mail só é lido quando o workflow roda, então há o mesmo atraso do agendamento. Essa função precisa de código adicional no `alerta_filmes.py` (`emails_para_issues`) e não está ativa por padrão.
+O script agora lê a caixa de entrada do Gmail (IMAP) e transforma e-mails em Issues: o **assunto** vira o título. Só valem e-mails de remetentes listados em `EMAIL_TO`, e os avisos do próprio script (assunto começando com "Ahoy") são ignorados. O e-mail só é lido quando o workflow roda, então há o mesmo atraso do agendamento.
 
 ---
 
