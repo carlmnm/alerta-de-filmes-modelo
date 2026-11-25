@@ -9,6 +9,10 @@ fecha a Issue. Issue fechada = já avisado, então não precisa de arquivo de es
 import json
 from html import escape
 from email.utils import formataddr
+import email
+import imaplib
+from email.header import decode_header, make_header
+from email.utils import getaddresses, parseaddr
 import os
 import re
 import smtplib
@@ -115,10 +119,41 @@ def send_mail(subject, texto, html=None):
         smtp.login(GMAIL_USER, GMAIL_PASS)
         smtp.send_message(msg)
 
+def emails_para_issues():
+    """Cada e-mail novo de remetente permitido vira uma Issue (assunto = título)."""
+    permitidos = {a.lower() for _, a in getaddresses([EMAIL_TO]) if a}
+    M = imaplib.IMAP4_SSL("imap.gmail.com")
+    try:
+        M.login(GMAIL_USER, GMAIL_PASS)
+        M.select("INBOX")
+        _, dados = M.search(None, "UNSEEN")
+        for num in dados[0].split():
+            _, partes = M.fetch(num, "(BODY.PEEK[HEADER.FIELDS (FROM SUBJECT)])")
+            msg = email.message_from_bytes(partes[0][1])
+            remetente = parseaddr(msg.get("From", ""))[1].lower()
+            if remetente not in permitidos:
+                continue  # deixa como está, não lido
+            titulo = str(make_header(decode_header(msg.get("Subject", "")))).strip()
+            titulo = re.sub(r"^((re|enc|fwd|fw)\s*:\s*)+", "", titulo, flags=re.I).strip()
+            if titulo and not titulo.lower().startswith("ahoy"):
+                gh("/issues", "POST", {"title": titulo})
+                print(f"- e-mail virou Issue: {titulo}")
+            M.store(num, "+FLAGS", "\\Seen")
+    finally:
+        try:
+            M.logout()
+        except Exception:
+            pass
+
 
 def main():
     if not MANIFEST.endswith("/manifest.json"):
         sys.exit("AIOSTREAMS_MANIFEST_URL deve terminar em /manifest.json")
+
+    try:
+        emails_para_issues()
+    except Exception as e:  # falha no e-mail não impede a checagem dos filmes
+        print(f"Erro ao ler e-mails: {e}")
 
     issues = [i for i in gh("/issues?state=open&per_page=100") if "pull_request" not in i]
     print(f"{len(issues)} filme(s) na lista")
