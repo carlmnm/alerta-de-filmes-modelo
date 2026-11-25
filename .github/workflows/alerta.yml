@@ -1,0 +1,28 @@
+name: Alerta de filmes
+
+on:
+  schedule:
+    - cron: "0 11,15,19,23 * * *"   # quatro horários por dia (UTC)
+  workflow_dispatch:         # botão "Run workflow" para testar na hora
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  checar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Checar filmes da lista
+        run: python alerta_filmes.py
+        env:
+          AIOSTREAMS_MANIFEST_URL: ${{ secrets.AIOSTREAMS_MANIFEST_URL }}
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MIN_STREAMS: "2"
